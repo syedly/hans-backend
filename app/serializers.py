@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import (
-    CustomUser, Purchase
+    CustomUser, Purchase,
+    Product
     )
 #
 class LoginSerializer(serializers.Serializer):
@@ -54,4 +55,9 @@ class SignupSerializer(serializers.ModelSerializer):
 class PurchaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Purchase
+        fields = '__all__'
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
         fields = '__all__'

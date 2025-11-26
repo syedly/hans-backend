@@ -4,11 +4,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.generics import ListAPIView
 from .serializers import (
     LoginSerializer, SignupSerializer,
-    PurchaseSerializer
+    PurchaseSerializer, ProductSerializer
     )
 #
 from .models import (
-    CustomUser, Purchase
+    Product, Purchase
     )
 #
 
@@ -43,3 +43,7 @@ class LoginAPIView(generics.GenericAPIView):
 class PurchaseListAPIView(ListAPIView):
     queryset = Purchase.objects.all().order_by('-id')
     serializer_class = PurchaseSerializer
+
+class ProductListAPIView(ListAPIView):
+    queryset = Product.objects.all().order_by('-id')
+    serializer_class = ProductSerializer

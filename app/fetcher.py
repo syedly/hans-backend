@@ -7,179 +7,122 @@ import dotenv
 dotenv.load_dotenv()
 
 purchase_url = os.getenv('API_FETCH_URL_PURCHASE')
+product_url = os.getenv('API_FETCH_URL_PRODUCT')
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "hans.settings")
 django.setup()
 
-from app.models import Purchase
+from app.models import Purchase, Product
 
 
-def fetch_api_data():
-    url = purchase_url
-    response = requests.get(url)
+# ================================
+# Fetch & Save Product Data
+# ================================
+def fetch_product_data():
+    response = requests.get(product_url)
 
     if response.status_code != 200:
-        print("API failed")
+        print("Product API failed")
         return
 
-    data = response.json()
+    products = response.json()
 
-    for item in data:
+    for item in products:
+        external_id = item.get("id")
+
+        # Skip if product already exists
+        if Product.objects.filter(external_id=external_id).exists():
+            print(f"Skipping existing product: {external_id}")
+            continue
+
+        Product.objects.create(
+            external_id=external_id,
+            name=item.get("name", ""),
+            description=item.get("description", ""),
+
+            price=item.get("price"),
+            discounted_price=item.get("discounted_price"),
+
+            is_available=item.get("is_available", True),
+            status=item.get("status", ""),
+
+            category=item.get("category", ""),
+            sku=item.get("sku", ""),
+
+            stock=item.get("stock"),
+            image=item.get("image"),
+        )
+
+        print(f"Added new product: {external_id}")
+
+
+# ================================
+# Fetch & Save Purchase Data
+# ================================
+def fetch_purchase_data():
+    response = requests.get(purchase_url)
+
+    if response.status_code != 200:
+        print("Purchase API failed")
+        return
+
+    purchases = response.json()
+
+    for item in purchases:
+        external_id = item.get("id")
+
+        # Skip if purchase already exists
+        if Purchase.objects.filter(external_id=external_id).exists():
+            print(f"Skipping existing purchase: {external_id}")
+            continue
+
         user = item.get("user", {})
         product = item.get("product", {})
 
-        Purchase.objects.update_or_create(
-            external_id=item.get("id"),
-            defaults={
+        Purchase.objects.create(
+            external_id=external_id,
 
-                # --- Purchase Fields ---
-                "purchase_date": item.get("purchase_date"),
-                "purchase_month": item.get("purchase_month"),
-                "purchase_year": item.get("purchase_year"),
-                "province": item.get("province", ""),
-                "contact": item.get("contact", ""),
-                "status": item.get("status", "pending"),
-                "last_digits": item.get("last_digits", ""),
-                "shipping_address": item.get("shipping_address", ""),
+            purchase_date=item.get("purchase_date"),
+            purchase_month=item.get("purchase_month"),
+            purchase_year=item.get("purchase_year"),
 
-                # --- User Fields ---
-                "user_id": user.get("id"),
-                "user_username": user.get("username", ""),
-                "user_first_name": user.get("first_name", ""),
-                "user_last_name": user.get("last_name", ""),
-                "user_email": user.get("email", ""),
+            province=item.get("province", ""),
+            contact=item.get("contact", ""),
+            status=item.get("status", "pending"),
+            last_digits=item.get("last_digits", ""),
+            shipping_address=item.get("shipping_address", ""),
 
-                # --- Product Fields ---
-                "product_id": product.get("id"),
-                "product_name": product.get("name", ""),
-                "product_description": product.get("description", ""),
-                "product_price": product.get("price"),
-                "product_discounted_price": product.get("discounted_price"),
-                "product_is_available": product.get("is_available", True),
-                "product_status": product.get("status", ""),
-                "product_category": product.get("category", ""),
-                "product_sku": product.get("sku", ""),
-                "product_stock": product.get("stock", ""),
-                "product_image_url": product.get("image_url", None),
-            }
+            user_id=user.get("id"),
+            user_username=user.get("username", ""),
+            user_first_name=user.get("first_name", ""),
+            user_last_name=user.get("last_name", ""),
+            user_email=user.get("email", ""),
+
+            product_id=product.get("id"),
+            product_name=product.get("name", ""),
+            product_description=product.get("description", ""),
+            product_price=product.get("price"),
+            product_discounted_price=product.get("discounted_price"),
+            product_is_available=product.get("is_available", True),
+            product_status=product.get("status", ""),
+            product_category=product.get("category", ""),
+            product_sku=product.get("sku", ""),
+            product_stock=product.get("stock", ""),
+            product_image_url=product.get("image_url", None),
         )
 
+        print(f"Added new purchase: {external_id}")
 
-    print("Fetched one cycle!")
 
-
+# ================================
+# Main Loop
+# ================================
 while True:
-    fetch_api_data()
+    print("\n=== Fetching Products ===")
+    fetch_product_data()
+
+    print("\n=== Fetching Purchases ===")
+    fetch_purchase_data()
+
     print("Waiting 2 minutes...\n")
     time.sleep(120)
-
-#send mail method
-# import time
-# import os
-# import requests
-# import django
-# from dotenv import load_dotenv
-
-# load_dotenv()
-
-# purchase_url = os.getenv('API_FETCH_URL_PURCHASE')
-
-# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "hans.settings")
-# django.setup()
-
-# from django.core.mail import send_mail
-# from django.conf import settings
-# from app.models import Purchase
-
-# # List to collect changes in this cycle
-# updated_or_created = []
-
-# def fetch_api_data():
-#     global updated_or_created
-#     updated_or_created = []  # Reset every cycle
-
-#     try:
-#         response = requests.get(purchase_url, timeout=30)
-#         response.raise_for_status()
-#     except Exception as e:
-#         print(f"API failed: {e}")
-#         return
-
-#     data = response.json()
-#     new_count = 0
-#     updated_count = 0
-
-#     for item in data:
-#         external_id = item["id"]
-#         obj, created = Purchase.objects.update_or_create(
-#             external_id=external_id,
-#             defaults={
-#                 "purchase_date": item["purchase_date"],
-#                 "purchase_month": item["purchase_month"],
-#                 "purchase_year": item["purchase_year"],
-#                 "user_email": item["user__email"],
-#                 "user_username": item["user__username"],
-#                 "product_name": item["product__name"],
-#                 "product_price": item["product__price"],
-#                 "product_image_url": item["product__image_url"],
-#             }
-#         )
-
-#         status = "NEW" if created else "UPDATED"
-#         if created:
-#             new_count += 1
-#         else:
-#             updated_count += 1
-
-#         updated_or_created.append({
-#             "id": external_id,
-#             "status": status,
-#             "customer": item["user__username"] or item["user__email"],
-#             "product": item["product__name"],
-#             "price": item["product__price"],
-#             "date": item["purchase_date"],
-#         })
-
-#     print(f"Fetched {len(data)} items → {new_count} new, {updated_count} updated")
-
-#     # SEND EMAIL ONLY IF SOMETHING CHANGED
-#     if updated_or_created:
-#         send_summary_email(new_count, updated_count)
-
-# def send_summary_email(new_count, updated_count):
-#     subject = f"New Purchases Alert – {new_count} New, {updated_count} Updated"
-    
-#     body = f"""
-# Hi team,
-
-# Your Order Management System just synced new data!
-
-# Summary:
-# • New purchases   : {new_count}
-# • Updated purchases: {updated_count}
-# • Total synced     : {len(updated_or_created)}
-# • Time             : {time.strftime("%Y-%m-%d %H:%M:%S")}
-
-# Details:
-# """
-#     for entry in updated_or_created:
-#         body += f"\n• [{entry['status']}] Order #{entry['id']} | {entry['customer']} bought {entry['product']} (${entry['price']}) on {entry['date']}"
-
-#     body += "\n\nRegards,\nYour Auto Sync Bot 🤖"
-
-#     send_mail(
-#         subject=subject,
-#         message=body,
-#         from_email=settings.DEFAULT_FROM_EMAIL,
-#         recipient_list=["you@example.com", "team@company.com"],  # CHANGE THESE EMAILS
-#         fail_silently=False,
-#     )
-#     print("Email sent successfully!")
-
-# # MAIN LOOP – Runs forever every 2 minutes
-# print("Purchase sync bot started! Running every 2 minutes...")
-# while True:
-#     fetch_api_data()
-#     print("Waiting 2 minutes before next sync...\n")
-#     time.sleep(120)  # 120 seconds = 2 minutes
-    

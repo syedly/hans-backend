@@ -73,3 +73,25 @@ class Purchase(models.Model):
 
     def __str__(self):
         return f"{self.product_name} ({self.user_username})"
+
+class Product(models.Model):
+    external_id = models.IntegerField(unique=True)
+
+    name = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True)
+
+    price = models.FloatField(null=True, blank=True)
+    discounted_price = models.FloatField(null=True, blank=True)
+
+    is_available = models.BooleanField(default=True)
+    status = models.CharField(max_length=50, null=True, blank=True)
+    category = models.CharField(max_length=100, null=True, blank=True)
+    sku = models.CharField(max_length=100, null=True, blank=True)
+
+    stock = models.IntegerField(null=True, blank=True)
+    image = models.URLField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.name
