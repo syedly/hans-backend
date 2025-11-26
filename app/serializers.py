@@ -61,3 +61,8 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
+
+class PurchaseStatsSerializer(serializers.Serializer):
+    full_dates = serializers.ListField()
+    bar_chart = serializers.ListField()
+    pie_chart = serializers.ListField()

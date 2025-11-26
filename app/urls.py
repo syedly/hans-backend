@@ -1,7 +1,8 @@
 from django.urls import path
 from .views import (
     LoginAPIView, SignupAPIView, 
-    PurchaseListAPIView, ProductListAPIView
+    PurchaseListAPIView, ProductListAPIView,
+    PurchaseStatsView
     )
 
 urlpatterns = [
@@ -9,4 +10,6 @@ urlpatterns = [
     path('signup/', SignupAPIView.as_view(), name='api-signup'),
     path('purchases/', PurchaseListAPIView.as_view(), name='api-purchases'),
     path('products/', ProductListAPIView.as_view(), name='api-products'),
+    # --- barchart and piechart stats endpoint ---
+    path("purchase/stats/", PurchaseStatsView.as_view(), name="purchase-stats"),
 ]
