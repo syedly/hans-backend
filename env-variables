@@ -1,0 +1,16 @@
+# database config
+DB_HOST = 'localhost'
+DB_PORT = '3306'   
+DB_NAME = 'hans'
+DB_USER = 'root'
+DB_PASSWORD = 'admin'
+
+# secret key
+SECRET_KEY = 'django-insecure-)90qzz!9s@w3*g72=5f2u#0-n42fxcehf=s6)l968pb^(as1f0'
+
+# DB_URL
+DB_URL = "mysql+pymysql://root:admin@localhost:3306/hans"
+
+# api fetch
+API_FETCH_URL_PURCHASE = "https://api.example.com/data"
+API_FETCH_URL_PRODUCT = "https://api.example.com/data"
