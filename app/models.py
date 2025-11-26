@@ -73,20 +73,3 @@ class Purchase(models.Model):
 
     def __str__(self):
         return f"{self.product_name} ({self.user_username})"
-
-
-# class Purchase(models.Model):
-#     external_id = models.IntegerField(unique=True)
-#     purchase_date = models.IntegerField()
-#     purchase_month = models.CharField(max_length=20)
-#     purchase_year = models.IntegerField()
-
-#     user_email = models.EmailField()
-#     user_username = models.CharField(max_length=100)
-
-#     product_name = models.CharField(max_length=200)
-#     product_price = models.DecimalField(max_digits=10, decimal_places=2)
-#     # product_image_url = models.URLField(max_length=500) apply migrations after uncommenting
-
-#     def __str__(self):
-#         return f"{self.product_name} ({self.user_username})"

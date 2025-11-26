@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from .models import (
     CustomUser, Purchase
     )
-
+#
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)

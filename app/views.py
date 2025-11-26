@@ -2,14 +2,15 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.generics import ListAPIView
-from .models import Purchase
 from .serializers import (
     LoginSerializer, SignupSerializer,
     PurchaseSerializer
     )
+#
 from .models import (
     CustomUser, Purchase
     )
+#
 
 class SignupAPIView(generics.CreateAPIView):
     serializer_class = SignupSerializer

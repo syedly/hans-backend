@@ -25,14 +25,17 @@ def fetch_api_data():
     data = response.json()
 
     for item in data:
+        user = item.get("user", {})
+        product = item.get("product", {})
+
         Purchase.objects.update_or_create(
-            external_id=item["id"],
+            external_id=item.get("id"),
             defaults={
 
                 # --- Purchase Fields ---
-                "purchase_date": item["purchase_date"],
-                "purchase_month": item["purchase_month"],
-                "purchase_year": item["purchase_year"],
+                "purchase_date": item.get("purchase_date"),
+                "purchase_month": item.get("purchase_month"),
+                "purchase_year": item.get("purchase_year"),
                 "province": item.get("province", ""),
                 "contact": item.get("contact", ""),
                 "status": item.get("status", "pending"),
@@ -40,26 +43,27 @@ def fetch_api_data():
                 "shipping_address": item.get("shipping_address", ""),
 
                 # --- User Fields ---
-                "user_id": item["user_id"],
-                "user_username": item["user_username"],
-                "user_first_name": item["user_first_name"],
-                "user_last_name": item["user_last_name"],
-                "user_email": item["user_email"],
+                "user_id": user.get("id"),
+                "user_username": user.get("username", ""),
+                "user_first_name": user.get("first_name", ""),
+                "user_last_name": user.get("last_name", ""),
+                "user_email": user.get("email", ""),
 
                 # --- Product Fields ---
-                "product_id": item["product_id"],
-                "product_name": item["product_name"],
-                "product_description": item.get("product_description", ""),
-                "product_price": item["product_price"],
-                "product_discounted_price": item["product_discounted_price"],
-                "product_is_available": item["product_is_available"],
-                "product_status": item.get("product_status", ""),
-                "product_category": item.get("product_category", ""),
-                "product_sku": item.get("product_sku", ""),
-                "product_stock": item.get("product_stock", ""),
-                "product_image_url": item.get("product_image_url", None),
+                "product_id": product.get("id"),
+                "product_name": product.get("name", ""),
+                "product_description": product.get("description", ""),
+                "product_price": product.get("price"),
+                "product_discounted_price": product.get("discounted_price"),
+                "product_is_available": product.get("is_available", True),
+                "product_status": product.get("status", ""),
+                "product_category": product.get("category", ""),
+                "product_sku": product.get("sku", ""),
+                "product_stock": product.get("stock", ""),
+                "product_image_url": product.get("image_url", None),
             }
         )
+
 
     print("Fetched one cycle!")
 
